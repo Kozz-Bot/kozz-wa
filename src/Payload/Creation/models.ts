@@ -7,6 +7,5 @@ export type MessageReceived = {
 	body: string;
 	to: ContactID;
 	id: MessageID;
-
 	groupName?: string;
 };
