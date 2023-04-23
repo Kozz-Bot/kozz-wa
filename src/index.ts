@@ -3,6 +3,10 @@ dotenv.config();
 
 import { io } from 'socket.io-client';
 import whatsappBoundary from './Client';
-const socket = io('http://gramont.ddns.net:4521');
+import { registerSocketHandlers } from './Socket';
+const socket = io(`${process.env.GATEWAY_URL}`);
 
-whatsappBoundary(socket).initialize();
+const wppClient = whatsappBoundary(socket);
+wppClient.initialize();
+
+registerSocketHandlers(wppClient, socket);

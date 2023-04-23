@@ -25,14 +25,18 @@ export const createMessageReveivedPayload = async (
 };
 
 export const createMediaReceivedPayload = async (message: Message) => {
-	if (message.hasMedia) {
-		const messageMedia = await message.downloadMedia();
+	try {
+		if (message.hasMedia) {
+			const messageMedia = await message.downloadMedia();
 
-		return {
-			data: messageMedia.data,
-			mimeType: messageMedia.mimetype,
-			fileName: messageMedia.filename || null,
-			sizeInBytes: messageMedia.filesize || null,
-		};
+			return {
+				data: messageMedia.data,
+				mimeType: messageMedia.mimetype,
+				fileName: messageMedia.filename || null,
+				sizeInBytes: messageMedia.filesize || null,
+			};
+		}
+	} catch (e) {
+		console.warn(`[ERROR ON MESSAGE ${message.from}]`);
 	}
 };
