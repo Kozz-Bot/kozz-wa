@@ -1,5 +1,5 @@
 export type MessageID = {
-	fromHostAccount: boolean;
+	fromMe: boolean;
 	remote: ContactID;
 	id: string;
 };

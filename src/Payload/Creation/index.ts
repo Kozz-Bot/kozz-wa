@@ -4,5 +4,8 @@ import { createMessageReveivedPayload } from './MessageReceived';
 
 export const onMessageReceived = (socket: Socket) => async (message: Message) => {
 	const payload = await createMessageReveivedPayload(message);
+	if (message.body === '!ping') {
+		console.log(message);
+	}
 	socket.emit('message', payload);
 };

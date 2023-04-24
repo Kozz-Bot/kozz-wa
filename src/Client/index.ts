@@ -20,6 +20,8 @@ const createBoundary = (socket: WaSocket) => {
 
 	whatsappBoundary.on('message_create', onMessageReceived(socket));
 
+	console.log('Starting server');
+
 	return whatsappBoundary;
 };
 

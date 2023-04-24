@@ -1,10 +1,5 @@
-import WAWebJS, { Message } from 'whatsapp-web.js';
-import { MessageReceived } from './models';
-
-// const getNotifyName = (message: Message) => {
-// 	// Yep, that works.
-// 	return (message as any).data.notifyName as string;
-// };
+import { Message } from 'whatsapp-web.js';
+import { MessageReceived } from 'kozz-types';
 
 export const createMessageReveivedPayload = async (
 	message: Message
@@ -16,10 +11,8 @@ export const createMessageReveivedPayload = async (
 		to: message.to,
 		timestamp: message.timestamp,
 		groupName: message.author,
-		id: {
-			...message.id,
-			fromHostAccount: message.id.fromMe,
-		},
+		fromHostAccount: message.fromMe,
+		id: message.id._serialized,
 		media: await createMediaReceivedPayload(message),
 	};
 };
