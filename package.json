@@ -1,7 +1,7 @@
 {
-	"name": "Hello-World",
+	"name": "kozz-wa",
 	"version": "1.0.0",
-	"description": "Hello world project",
+	"description": "Whatsapp boundary for Kozz Bot integration",
 	"main": "./dist/index.js",
 	"license": "MIT",
 	"scripts": {

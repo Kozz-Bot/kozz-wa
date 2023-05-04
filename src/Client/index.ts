@@ -18,6 +18,17 @@ const createBoundary = (socket: WaSocket) => {
 		console.log('[SERVIDOR]: Cliente pronto');
 	});
 
+	whatsappBoundary.on('change_state', state => {
+		console.log(state);
+	});
+
+	whatsappBoundary.on('auth_failure', message => console.log(message));
+
+	whatsappBoundary.on('loading_screen', (percent, message) => ({
+		percent,
+		message,
+	}));
+
 	whatsappBoundary.on('message_create', onMessageReceived(socket));
 
 	console.log('Starting server');
