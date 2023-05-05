@@ -1,5 +1,6 @@
 import { Message } from 'whatsapp-web.js';
 import { MessageReceived } from 'kozz-types';
+import { createContatcPayload } from './contact';
 
 export const createMessageReveivedPayload = async (
 	message?: Message
@@ -20,6 +21,7 @@ export const createMessageReveivedPayload = async (
 		media: await createMediaReceivedPayload(message),
 		boundaryId: process.env.BOUNDARY_ID as string,
 		quotedMessage: await createMessageReveivedPayload(quotedMessage),
+		contact: createContatcPayload(await message.getContact()),
 	};
 };
 
