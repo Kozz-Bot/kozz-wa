@@ -1,4 +1,5 @@
 import { SendMessagePayload } from 'kozz-types/dist';
+import { getFormattedDateAndTime } from 'src/util/Time';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 
 export const reply_with_text =
@@ -25,8 +26,12 @@ export const reply_with_sticker =
 			{
 				sendMediaAsSticker: true,
 				quotedMessageId: payload.quoteId,
-				stickerName: 'Criado por',
-				stickerAuthor: 'Kozz-Bot do Tramonta',
+				stickerName: [
+					'Criado por',
+					`${payload.contact.publicName}`,
+					`${getFormattedDateAndTime()}`,
+				].join('\n'),
+				stickerAuthor: 'Kozz-Bot\ndo Tramonta',
 				stickerCategories: ['🥴'],
 			}
 		);
