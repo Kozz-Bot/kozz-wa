@@ -3,3 +3,4 @@ dist
 coverage
 .wwebjs_auth
 .env
+/keys/*
