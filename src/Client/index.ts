@@ -8,6 +8,9 @@ type WaSocket = Socket;
 const createBoundary = (socket: WaSocket) => {
 	const whatsappBoundary = new Client({
 		authStrategy: new LocalAuth(),
+		puppeteer: {
+			executablePath: '/usr/bin/google-chrome-stable',
+		},
 	});
 
 	whatsappBoundary.on('qr', qr => {

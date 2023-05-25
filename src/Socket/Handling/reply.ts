@@ -1,6 +1,7 @@
 import { SendMessagePayload } from 'kozz-types/dist';
 import { getFormattedDateAndTime } from 'src/util/Time';
 import { Client, MessageMedia } from 'whatsapp-web.js';
+import fs from 'fs/promises';
 
 /**
  * Reply a given message with plain text
@@ -54,12 +55,30 @@ export const reply_with_media =
 
 		const { data, fileName, mimeType, sizeInBytes } = payload.media;
 
-		whatsappBoundary.sendMessage(
-			payload.chatId,
-			new MessageMedia(mimeType, data, fileName, sizeInBytes),
-			{
-				quotedMessageId: payload.quoteId,
-				caption: payload.body,
-			}
-		);
+		const tempFilePath = `./media/temp/${fileName || 'temp'}`;
+
+		try {
+			console.log({ data: data.slice(0, 30), fileName, mimeType, sizeInBytes });
+			whatsappBoundary.sendMessage(
+				payload.chatId,
+				new MessageMedia(mimeType, data, fileName, sizeInBytes),
+				{
+					quotedMessageId: payload.quoteId,
+					caption: payload.body,
+				}
+			);
+		} catch (e) {
+			fs.writeFile(tempFilePath, data, {
+				encoding: 'base64',
+			}).then(() => {
+				whatsappBoundary.sendMessage(
+					payload.chatId,
+					MessageMedia.fromFilePath(tempFilePath),
+					{
+						quotedMessageId: payload.quoteId,
+						caption: payload.body,
+					}
+				);
+			});
+		}
 	};
