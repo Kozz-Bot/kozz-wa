@@ -43,6 +43,8 @@ export const reply_with_sticker =
 		);
 	};
 
+const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 16; // 16 megabytes
+
 export const reply_with_media =
 	(whatsappBoundary: Client) => (payload: SendMessagePayload) => {
 		console.log('requesting reply with media');
@@ -53,12 +55,23 @@ export const reply_with_media =
 			);
 		}
 
-		const { data, fileName, mimeType, sizeInBytes } = payload.media;
+		let { data, fileName, mimeType, sizeInBytes } = payload.media;
 
 		const tempFilePath = `./media/temp/${fileName || 'temp'}`;
 
+		sizeInBytes = sizeInBytes || Buffer.from(data, 'base64').length;
+
+		if (sizeInBytes > __MAX_VIDEO_SIZE__) {
+			return whatsappBoundary.sendMessage(
+				payload.chatId,
+				'Error: Media file too large, max size 16 MB',
+				{
+					quotedMessageId: payload.quoteId,
+				}
+			);
+		}
+
 		try {
-			console.log({ data: data.slice(0, 30), fileName, mimeType, sizeInBytes });
 			whatsappBoundary.sendMessage(
 				payload.chatId,
 				new MessageMedia(mimeType, data, fileName, sizeInBytes),
