@@ -20,14 +20,15 @@ export const createMessageReveivedPayload = async (
 	const quotedMessage = await message.getQuotedMessage();
 
 	const getMessageType = (message: Message) => typeMap[message.type] || 'OTHER';
+	const chat = await message.getChat();
 
 	return {
 		platform: 'WA',
 		body: message.body.toLowerCase(),
-		from: message.from,
-		to: message.to,
+		from: createContatcPayload(await message.getContact()).id,
+		to: message.fromMe ? chat.id._serialized : message.from,
 		timestamp: message.timestamp * 1000 || new Date().getTime(),
-		groupName: message.author,
+		groupName: chat.name,
 		fromHostAccount: message.fromMe,
 		id: message.id._serialized,
 		media: await createMediaReceivedPayload(message),
