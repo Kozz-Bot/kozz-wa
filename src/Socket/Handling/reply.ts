@@ -2,6 +2,7 @@ import { SendMessagePayload } from 'kozz-types/dist';
 import { getFormattedDateAndTime } from 'src/util/Time';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 import fs from 'fs/promises';
+import { Socket } from 'socket.io-client';
 
 /**
  * Reply a given message with plain text
@@ -9,7 +10,7 @@ import fs from 'fs/promises';
  * @returns
  */
 export const reply_with_text =
-	(whatsappBoundary: Client) => (payload: SendMessagePayload) => {
+	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
 		console.log('got reply with text');
 		whatsappBoundary.sendMessage(payload.chatId, payload.body, {
 			quotedMessageId: payload.quoteId,
@@ -17,7 +18,7 @@ export const reply_with_text =
 	};
 
 export const reply_with_sticker =
-	(whatsappBoundary: Client) => (payload: SendMessagePayload) => {
+	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
 		console.log('requesting reply with sticker');
 		if (!payload.media) {
 			return console.warn(
@@ -46,7 +47,7 @@ export const reply_with_sticker =
 const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 16; // 16 megabytes
 
 export const reply_with_media =
-	(whatsappBoundary: Client) => (payload: SendMessagePayload) => {
+	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
 		console.log('requesting reply with media');
 
 		if (!payload.media) {

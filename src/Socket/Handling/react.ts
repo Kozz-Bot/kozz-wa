@@ -1,5 +1,6 @@
 import { Client } from 'whatsapp-web.js';
 import { ReactToMessagePayload } from 'kozz-types';
+import { Socket } from 'socket.io-client';
 
 /**
  * [TODO]:
@@ -9,7 +10,8 @@ import { ReactToMessagePayload } from 'kozz-types';
  * @returns
  */
 export const react_message =
-	(whatsappBoundary: Client) => async (payload: ReactToMessagePayload) => {
+	(whatsappBoundary: Client, _: Socket) =>
+	async (payload: ReactToMessagePayload) => {
 		const messages = await whatsappBoundary.searchMessages(payload.messageId, {
 			chatId: payload.chatId,
 			limit: 1,

@@ -10,6 +10,6 @@ export const registerSocketHandlers = (whatsappBoundary: Client, socket: Socket)
 
 	Object.entries(handlers).forEach(([evName, handler]) => {
 		console.log(`Registering handler for event ${evName}`);
-		socket.on(evName, handler(whatsappBoundary));
+		socket.on(evName, handler(whatsappBoundary, socket));
 	});
 };
