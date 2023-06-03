@@ -21,7 +21,6 @@ const resourceMap: ResourceMap = {
 export const ask_resource =
 	(whatsappBoundary: Client, socket: Socket) =>
 	async (payload: AskResourcePayload) => {
-		console.log('asking resource', payload);
 		const resourceToBeFound = payload.request.resource;
 		const resourceGetterFn = resourceMap[resourceToBeFound];
 
