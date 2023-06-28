@@ -7,7 +7,6 @@ export const registerIntroductionSocketEvent = (socket: Socket) => {
 		OS: process.platform,
 		platform: 'WA',
 		role: 'boundary',
-		timestamp: new Date().getTime(),
 		id: process.env.BOUNDARY_ID,
 	};
 	socket.emit('introduction', signPayload(introduction));

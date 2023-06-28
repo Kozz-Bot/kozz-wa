@@ -4,3 +4,4 @@ coverage
 .wwebjs_auth
 .env
 /keys/*
+.wwebjs_cache
