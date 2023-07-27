@@ -27,10 +27,12 @@ const createBoundary = (socket: WaSocket) => {
 
 	whatsappBoundary.on('auth_failure', message => console.log(message));
 
-	whatsappBoundary.on('loading_screen', (percent, message) => ({
-		percent,
-		message,
-	}));
+	whatsappBoundary.on('loading_screen', (percent, message) =>
+		console.log({
+			percent,
+			message,
+		})
+	);
 
 	whatsappBoundary.on('message_create', onMessageReceived(socket));
 
