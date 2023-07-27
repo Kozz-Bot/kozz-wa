@@ -4,6 +4,7 @@ import {
 	getAllContacts,
 	getContactById,
 	getContactProfilePhoto,
+	getMessageById,
 } from 'src/Client/Getters';
 import { Client } from 'whatsapp-web.js';
 
@@ -16,6 +17,7 @@ const resourceMap: ResourceMap = {
 	all_contacts: getAllContacts,
 	contact_by_id: getContactById,
 	contact_profile_pic: getContactProfilePhoto,
+	message_by_id: getMessageById,
 };
 
 export const ask_resource =
