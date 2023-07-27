@@ -1,0 +1,207 @@
+diff --git a/node_modules/whatsapp-web.js/index.d.ts b/node_modules/whatsapp-web.js/index.d.ts
+index 7e2b86c..8bcf3e6 100644
+--- a/node_modules/whatsapp-web.js/index.d.ts
++++ b/node_modules/whatsapp-web.js/index.d.ts
+@@ -728,144 +728,145 @@ declare namespace WAWebJS {
+      *   mentionedIds: []
+      * }
+      */
+-    export interface Message {
++    export class Message {
++        constructor(client: Client, data: any);
+         /** ACK status for the message */
+-        ack: MessageAck,
++        ack: MessageAck;
+         /** If the message was sent to a group, this field will contain the user that sent the message. */
+-        author?: string,
++        author?: string;
+         /** String that represents from which device type the message was sent */
+-        deviceType: string,
++        deviceType: string;
+         /** Message content */
+-        body: string,
++        body: string;
+         /** Indicates if the message was a broadcast */
+-        broadcast: boolean,
++        broadcast: boolean;
+         /** Indicates if the message was a status update */
+-        isStatus: boolean,
++        isStatus: boolean;
+         /** Indicates if the message is a Gif */
+-        isGif: boolean,
++        isGif: boolean;
+         /** Indicates if the message will disappear after it expires */
+-        isEphemeral: boolean,
++        isEphemeral: boolean;
+         /** ID for the Chat that this message was sent to, except if the message was sent by the current user */
+-        from: string,
++        from: string;
+         /** Indicates if the message was sent by the current user */
+-        fromMe: boolean,
++        fromMe: boolean;
+         /** Indicates if the message has media available for download */
+-        hasMedia: boolean,
++        hasMedia: boolean;
+         /** Indicates if the message was sent as a reply to another message */
+-        hasQuotedMsg: boolean,
++        hasQuotedMsg: boolean;
+         /** Indicates whether there are reactions to the message */
+-        hasReaction: boolean,
++        hasReaction: boolean;
+         /** Indicates the duration of the message in seconds */
+-        duration: string,
++        duration: string;
+         /** ID that represents the message */
+-        id: MessageId,
++        id: MessageId;
+         /** Indicates if the message was forwarded */
+-        isForwarded: boolean,
++        isForwarded: boolean;
+         /**
+          * Indicates how many times the message was forwarded.
+          * The maximum value is 127.
+          */
+-        forwardingScore: number,
++        forwardingScore: number;
+         /** Indicates if the message was starred */
+-        isStarred: boolean,
++        isStarred: boolean;
+         /** Location information contained in the message, if the message is type "location" */
+-        location: Location,
++        location: Location;
+         /** List of vCards contained in the message */
+-        vCards: string[],
++        vCards: string[];
+         /** Invite v4 info */
+-        inviteV4?: InviteV4Data,
++        inviteV4?: InviteV4Data;
+         /** MediaKey that represents the sticker 'ID' */
+-        mediaKey?: string,
++        mediaKey?: string;
+         /** Indicates the mentions in the message body. */
+-        mentionedIds: [],
++        mentionedIds: [];
+         /** Unix timestamp for when the message was created */
+-        timestamp: number,
++        timestamp: number;
+         /**
+          * ID for who this message is for.
+          * If the message is sent by the current user, it will be the Chat to which the message is being sent.
+          * If the message is sent by another user, it will be the ID for the current user.
+          */
+-        to: string,
++        to: string;
+         /** Message type */
+-        type: MessageTypes,
++        type: MessageTypes;
+         /** Links included in the message. */
+         links: Array<{
+             link: string,
+             isSuspicious: boolean
+-        }>,
++        }>;
+         /** Order ID */
+-        orderId: string,
++        orderId: string;
+         /** title */
+-        title?: string,
++        title?: string;
+         /** description*/
+-        description?: string,
++        description?: string;
+         /** Business Owner JID */
+-        businessOwnerJid?: string,
++        businessOwnerJid?: string;
+         /** Product JID */
+-        productId?: string,
++        productId?: string;
+         /** Last edit time */
+-        latestEditSenderTimestampMs?: number,
++        latestEditSenderTimestampMs?: number;
+         /** Last edit message author */
+-        latestEditMsgKey?: MessageId,
++        latestEditMsgKey?: MessageId;
+         /** Message buttons */
+-        dynamicReplyButtons?: object,
++        dynamicReplyButtons?: object;
+         /** Selected button ID */
+-        selectedButtonId?: string,
++        selectedButtonId?: string;
+         /** Selected list row ID */
+-        selectedRowId?: string,
++        selectedRowId?: string;
+         /** Returns message in a raw format */
+-        rawData: object,
++        rawData: object;
+         /* 
+         * Reloads this Message object's data in-place with the latest values from WhatsApp Web. 
+         * Note that the Message must still be in the web app cache for this to work, otherwise will return null.
+         */
+-        reload: () => Promise<Message>,
++        reload: () => Promise<Message>;
+         /** Accept the Group V4 Invite in message */
+-        acceptGroupV4Invite: () => Promise<{status: number}>,
++        acceptGroupV4Invite: () => Promise<{status: number}>;
+         /** Deletes the message from the chat */
+-        delete: (everyone?: boolean) => Promise<void>,
++        delete: (everyone?: boolean) => Promise<void>;
+         /** Downloads and returns the attached message media */
+-        downloadMedia: () => Promise<MessageMedia>,
++        downloadMedia: () => Promise<MessageMedia>;
+         /** Returns the Chat this message was sent in */
+-        getChat: () => Promise<Chat>,
++        getChat: () => Promise<Chat>;
+         /** Returns the Contact this message was sent from */
+-        getContact: () => Promise<Contact>,
++        getContact: () => Promise<Contact>;
+         /** Returns the Contacts mentioned in this message */
+-        getMentions: () => Promise<Contact[]>,
++        getMentions: () => Promise<Contact[]>;
+         /** Returns the quoted message, if any */
+-        getQuotedMessage: () => Promise<Message>,
++        getQuotedMessage: () => Promise<Message>;
+         /** 
+          * Sends a message as a reply to this message. 
+          * If chatId is specified, it will be sent through the specified Chat.
+          * If not, it will send the message in the same Chat as the original message was sent. 
+          */
+-        reply: (content: MessageContent, chatId?: string, options?: MessageSendOptions) => Promise<Message>,
++        reply: (content: MessageContent, chatId?: string, options?: MessageSendOptions) => Promise<Message>;
+         /** React to this message with an emoji*/
+-        react: (reaction: string) => Promise<void>,
++        react: (reaction: string) => Promise<void>;
+         /** 
+          * Forwards this message to another chat (that you chatted before, otherwise it will fail)
+          */
+-        forward: (chat: Chat | string) => Promise<void>,
++        forward: (chat: Chat | string) => Promise<void>;
+         /** Star this message */
+-        star: () => Promise<void>,
++        star: () => Promise<void>;
+         /** Unstar this message */
+-        unstar: () => Promise<void>,
++        unstar: () => Promise<void>;
+         /** Get information about message delivery status */
+-        getInfo: () => Promise<MessageInfo | null>,
++        getInfo: () => Promise<MessageInfo | null>;
+         /**
+          * Gets the order associated with a given message
+          */
+-        getOrder: () => Promise<Order>,
++        getOrder: () => Promise<Order>;
+         /**
+          * Gets the payment details associated with a given message
+          */
+-        getPayment: () => Promise<Payment>,
++        getPayment: () => Promise<Payment>;
+         /**
+          * Gets the reactions associated with the given message
+          */
+-        getReactions: () => Promise<ReactionList[]>,
++        getReactions: () => Promise<ReactionList[]>;
+         /** Edits the current message */
+-        edit: (content: MessageContent, options?: MessageEditOptions) => Promise<Message | null>,
++        edit: (content: MessageContent, options?: MessageEditOptions) => Promise<Message | null>;
+     }
+ 
+     /** ID that represents a message */

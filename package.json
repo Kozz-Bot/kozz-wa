@@ -9,7 +9,8 @@
 		"start": "tsc && link-module-alias && node dist/index.js",
 		"test": "jest",
 		"docs": "typedoc ./src/index.ts",
-		"types": "yarn add -D ~/Projects/kozz-types/"
+		"types": "yarn add -D ~/Projects/kozz-types/",
+		"postinstall": "npx patch-package"
 	},
 	"devDependencies": {
 		"@types/express": "^4.17.14",
@@ -17,6 +18,8 @@
 		"@types/qrcode-terminal": "^0.12.0",
 		"concurrently": "^7.5.0",
 		"kozz-types": "./../kozz-types/",
+		"nodemon": "^3.0.1",
+		"patch-package": "^8.0.0",
 		"typedoc": "^0.23.21",
 		"typescript": "^4.9.3"
 	},
@@ -26,7 +29,7 @@
 		"link-module-alias": "^1.2.0",
 		"qrcode-terminal": "^0.12.0",
 		"socket.io-client": "^4.6.1",
-		"whatsapp-web.js": "^1.21.0",
+		"whatsapp-web.js": "ssh://git@github.com:pedroslopez/whatsapp-web.js.git#8fc6e60",
 		"yarn": "^1.22.19"
 	},
 	"_moduleAliases": {
