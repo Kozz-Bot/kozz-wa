@@ -46,31 +46,23 @@ const createBoundary = (socket: WaSocket) => {
 		})
 	);
 
-	whatsappBoundary.on('message_create', onMessageReceived(socket));
-
-	// @ts-ignore
 	whatsappBoundary.on('message_create', async message => {
+		onMessageReceived(socket)(message);
+
 		if (message.body === '!edit') {
 			const sleep = (time: number) =>
 				new Promise(resolve => setTimeout(resolve, time));
 
 			await sleep(5000);
 
-			const canEdit = await whatsappBoundary.pupPage!.evaluate(async msgId => {
-				// @ts-ignore
-				let msg = window.Store.Msg.get(msgId);
-				if (!msg) return false;
-				// @ts-ignore
-				return await window.Store.MsgActionChecks.canEditText(msgId);
-				// @ts-ignore
-			}, message.id._serialized);
+			const quotedMessage = await message.getQuotedMessage();
 
-			console.log(canEdit);
-
-			message.getQuotedMessage().then(msg => msg.edit('Editado'));
+			const edit = await quotedMessage.edit('Editado');
+			console.log({ edit });
 		}
 	});
 
+	// @ts-ignore
 	return whatsappBoundary;
 };
 

@@ -28,7 +28,7 @@ export const createMessageReveivedPayload = async (
 		from: createContatcPayload(await message.getContact()).id,
 		to: message.fromMe ? chat.id._serialized : message.from,
 		timestamp: message.timestamp * 1000 || new Date().getTime(),
-		groupName: chat.name,
+		groupName: chat.isGroup ? chat.name : undefined,
 		fromHostAccount: message.fromMe,
 		id: message.id._serialized,
 		media: await createMediaReceivedPayload(message),

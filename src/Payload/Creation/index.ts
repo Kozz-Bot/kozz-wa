@@ -7,6 +7,6 @@ export const onMessageReceived = (socket: Socket) => async (message: Message) =>
 		const payload = await createMessageReveivedPayload(message);
 		socket.emit('message', payload);
 	} catch (e) {
-		console.warn(`Error on message`);
+		console.warn(`Error on message: ${e}`);
 	}
 };
