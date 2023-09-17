@@ -1,6 +1,7 @@
-import { Message } from 'whatsapp-web.js';
-import { MessageReceived, MessageType } from 'kozz-types';
+import { Client, Message } from 'whatsapp-web.js';
+import { Media, MessageReceived, MessageType } from 'kozz-types';
 import { createContatcPayload } from './contact';
+import { getContactById } from 'src/Client/Getters';
 
 const typeMap: Partial<{
 	[key in Message['type']]: MessageType;
@@ -12,8 +13,9 @@ const typeMap: Partial<{
 	sticker: 'STICKER',
 };
 
-export const createMessageReveivedPayload = async (
-	message?: Message
+export const createMessageReceivedPayload = async (
+	message: Message | undefined,
+	whatsappBoundary: Client
 ): Promise<MessageReceived | undefined> => {
 	if (!message) return undefined;
 
@@ -21,6 +23,14 @@ export const createMessageReveivedPayload = async (
 
 	const getMessageType = (message: Message) => typeMap[message.type] || 'OTHER';
 	const chat = await message.getChat();
+
+	const taggedContacts = message.body.match(/@[0-9]{8,18}/g);
+
+	const createTaggedContactPayload = (id: string) => {
+		return getContactById(whatsappBoundary)({
+			id: `${id.replace('@', '')}@c.us`,
+		});
+	};
 
 	return {
 		platform: 'WA',
@@ -33,15 +43,23 @@ export const createMessageReveivedPayload = async (
 		id: message.id._serialized,
 		media: await createMediaReceivedPayload(message),
 		boundaryId: process.env.BOUNDARY_ID as string,
-		quotedMessage: await createMessageReveivedPayload(quotedMessage),
+		quotedMessage: await createMessageReceivedPayload(
+			quotedMessage,
+			whatsappBoundary
+		),
 		contact: createContatcPayload(await message.getContact()),
 		messageType: getMessageType(message),
 		// the lib does not type the raw data
 		isViewOnce: ((message.rawData as any).isViewOnce as boolean) || false,
+		taggedContacts: await Promise.all(
+			taggedContacts?.map(tag => createTaggedContactPayload(tag)) || []
+		),
 	};
 };
 
-export const createMediaReceivedPayload = async (message: Message) => {
+export const createMediaReceivedPayload = async (
+	message: Message
+): Promise<Media | undefined> => {
 	try {
 		if (message.hasMedia) {
 			const messageMedia = await message.downloadMedia();
@@ -51,6 +69,7 @@ export const createMediaReceivedPayload = async (message: Message) => {
 				mimeType: messageMedia.mimetype,
 				fileName: messageMedia.filename || null,
 				sizeInBytes: messageMedia.filesize || null,
+				transportType: 'b64',
 			};
 		}
 	} catch (e) {

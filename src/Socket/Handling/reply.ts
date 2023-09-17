@@ -11,7 +11,6 @@ import { Socket } from 'socket.io-client';
  */
 export const reply_with_text =
 	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
-		console.log('got reply with text');
 		whatsappBoundary.sendMessage(payload.chatId, payload.body, {
 			quotedMessageId: payload.quoteId,
 		});
@@ -19,7 +18,6 @@ export const reply_with_text =
 
 export const reply_with_sticker =
 	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
-		console.log('requesting reply with sticker');
 		if (!payload.media) {
 			return console.warn(
 				'[ERROR]: Evoked replyWithSticker with payload without media'
@@ -47,9 +45,7 @@ export const reply_with_sticker =
 const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 16; // 16 megabytes
 
 export const reply_with_media =
-	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
-		console.log('requesting reply with media');
-
+	(whatsappBoundary: Client, _: Socket) => async (payload: SendMessagePayload) => {
 		if (!payload.media) {
 			return console.warn(
 				'[ERROR]: Evoked reply_with_media with payload without media'
@@ -72,15 +68,21 @@ export const reply_with_media =
 			);
 		}
 
+		/**
+		 * Creating proper instance for media whether its from b64 or url;
+		 */
+		const messageMedia =
+			payload.media.transportType === 'b64'
+				? new MessageMedia(mimeType, data, fileName, sizeInBytes)
+				: await MessageMedia.fromUrl(payload.media.data, {
+						unsafeMime: true,
+				  });
+
 		try {
-			whatsappBoundary.sendMessage(
-				payload.chatId,
-				new MessageMedia(mimeType, data, fileName, sizeInBytes),
-				{
-					quotedMessageId: payload.quoteId,
-					caption: payload.body,
-				}
-			);
+			whatsappBoundary.sendMessage(payload.chatId, messageMedia, {
+				quotedMessageId: payload.quoteId,
+				caption: payload.body,
+			});
 		} catch (e) {
 			fs.writeFile(tempFilePath, data, {
 				encoding: 'base64',

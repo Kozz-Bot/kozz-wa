@@ -47,8 +47,9 @@ const createBoundary = (socket: WaSocket) => {
 	);
 
 	whatsappBoundary.on('message_create', async message => {
-		onMessageReceived(socket)(message);
+		onMessageReceived(socket, whatsappBoundary)(message);
 
+		// Message edits just refuse to work with my account and i'm not sure why.
 		if (message.body === '!edit') {
 			const sleep = (time: number) =>
 				new Promise(resolve => setTimeout(resolve, time));
