@@ -42,7 +42,7 @@ export const createMessageReceivedPayload = async (
 		fromHostAccount: message.fromMe,
 		id: message.id._serialized,
 		media: await createMediaReceivedPayload(message),
-		boundaryId: process.env.BOUNDARY_ID as string,
+		boundaryName: process.env.BOUNDARY_ID as string,
 		quotedMessage: await createMessageReceivedPayload(
 			quotedMessage,
 			whatsappBoundary
