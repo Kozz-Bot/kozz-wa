@@ -7,7 +7,7 @@ export const registerIntroductionSocketEvent = (socket: Socket) => {
 		OS: process.platform,
 		platform: 'WA',
 		role: 'boundary',
-		id: process.env.BOUNDARY_ID || 'Kozz-Whatsapp',
+		name: process.env.BOUNDARY_ID || 'Kozz-Whatsapp',
 	};
 	socket.emit('introduction', signPayload(introduction));
 };

@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client';
 import { Client } from 'whatsapp-web.js';
-import { registerIntroductionSocketEvent } from './Emitting';
+import { registerIntroductionSocketEvent } from './Emitting/Introduction';
 import * as handlers from './Handling';
 
 export const registerSocketHandlers = (whatsappBoundary: Client, socket: Socket) => {
@@ -9,7 +9,6 @@ export const registerSocketHandlers = (whatsappBoundary: Client, socket: Socket)
 	});
 
 	Object.entries(handlers).forEach(([evName, handler]) => {
-		console.log(`Registering handler for event ${evName}`);
 		socket.on(evName, handler(whatsappBoundary, socket));
 	});
 };

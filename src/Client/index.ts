@@ -1,14 +1,9 @@
-import {
-	Client,
-	LocalAuth,
-	Message,
-	MessageContent,
-	MessageEditOptions,
-} from 'whatsapp-web.js';
+import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
-import { onMessageReceived } from 'src/Payload/Creation';
+import { onMessageReceived } from 'src/Socket/Emitting';
 import { Socket } from 'socket.io-client';
 import { runningOnWindows } from 'src/util/OS';
+import { onUserJoinedGroup } from 'src/Socket/Emitting/groupEvents';
 
 type WaSocket = Socket;
 
@@ -46,6 +41,13 @@ const createBoundary = (socket: WaSocket) => {
 		})
 	);
 
+	whatsappBoundary.on('group_join', onUserJoinedGroup(whatsappBoundary, socket));
+
+	whatsappBoundary.on('group_leave', onUserJoinedGroup(whatsappBoundary, socket));
+
+	// [TODO]: Make "host_metioned" a forwardable event.
+	whatsappBoundary.on('message_create', async message => {});
+
 	whatsappBoundary.on('message_create', async message => {
 		onMessageReceived(socket, whatsappBoundary)(message);
 
@@ -63,7 +65,6 @@ const createBoundary = (socket: WaSocket) => {
 		}
 	});
 
-	// @ts-ignore
 	return whatsappBoundary;
 };
 

@@ -29,7 +29,7 @@
 		"link-module-alias": "^1.2.0",
 		"qrcode-terminal": "^0.12.0",
 		"socket.io-client": "^4.6.1",
-		"whatsapp-web.js": "ssh://git@github.com:pedroslopez/whatsapp-web.js.git#df1b070",
+		"whatsapp-web.js": "ssh://git@github.com:pedroslopez/whatsapp-web.js.git#152f0a6",
 		"yarn": "^1.22.19"
 	},
 	"_moduleAliases": {

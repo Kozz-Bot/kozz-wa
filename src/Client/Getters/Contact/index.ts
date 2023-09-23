@@ -4,10 +4,6 @@ import { Client } from 'whatsapp-web.js';
 
 type RequestData = AskResourcePayload['request']['data'];
 
-type IdQuery = {
-	id: string;
-};
-
 export const getAllContacts = (whatsappBoundary: Client) => (_: RequestData) => {
 	return whatsappBoundary
 		.getContacts()
