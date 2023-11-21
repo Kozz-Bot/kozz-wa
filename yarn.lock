@@ -1168,7 +1168,7 @@ klaw-sync@^6.0.0:
     graceful-fs "^4.1.11"
 
 kozz-types@./../kozz-types/:
-  version "0.0.1"
+  version "0.1.0"
   dependencies:
     link-module-alias "^1.2.0"
 
@@ -2035,9 +2035,10 @@ webidl-conversions@^3.0.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"
   integrity sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==
 
-"whatsapp-web.js@ssh://git@github.com:pedroslopez/whatsapp-web.js.git#152f0a6":
-  version "1.22.2-alpha.0"
-  resolved "ssh://git@github.com:pedroslopez/whatsapp-web.js.git#152f0a64cdffdfb4d638043f537f87b2a6ebc492"
+whatsapp-web.js@^1.23.0:
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/whatsapp-web.js/-/whatsapp-web.js-1.23.0.tgz#e9d57bfbef282f8c97eb6ab9ae66859d047a1c16"
+  integrity sha512-88UwvuLCaak4HmSCsp2/JY00p0qYFVQ0rPM6VPPGyjfSmRUsI/UKGjPA/p4FnC+Dygwx7g88K3iB7UdMXkQKhw==
   dependencies:
     "@pedroslopez/moduleraid" "^5.0.2"
     fluent-ffmpeg "^2.1.2"

@@ -15,3 +15,4 @@ export const getClientMessageById = async (whatsappBoundary: Client, id: string)
 		return null;
 	}
 };
+
