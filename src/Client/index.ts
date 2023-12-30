@@ -46,23 +46,10 @@ const createBoundary = (socket: WaSocket) => {
 	whatsappBoundary.on('group_leave', onUserJoinedGroup(whatsappBoundary, socket));
 
 	// [TODO]: Make "host_metioned" a forwardable event.
-	whatsappBoundary.on('message_create', async message => {});
+	whatsappBoundary.on('message_create', async message => { });
 
 	whatsappBoundary.on('message_create', async message => {
 		onMessageReceived(socket, whatsappBoundary)(message);
-
-		// Message edits just refuse to work with my account and i'm not sure why.
-		if (message.body === '!edit') {
-			const sleep = (time: number) =>
-				new Promise(resolve => setTimeout(resolve, time));
-
-			await sleep(5000);
-
-			const quotedMessage = await message.getQuotedMessage();
-
-			const edit = await quotedMessage.edit('Editado');
-			console.log({ edit });
-		}
 	});
 
 	return whatsappBoundary;

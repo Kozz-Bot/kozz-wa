@@ -1167,8 +1167,10 @@ klaw-sync@^6.0.0:
   dependencies:
     graceful-fs "^4.1.11"
 
-kozz-types@./../kozz-types/:
-  version "0.1.0"
+kozz-types@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/kozz-types/-/kozz-types-0.1.2.tgz#1bc8b6a2646e1f4a95b14ec8a2d3d50b1a169c7d"
+  integrity sha512-Wcw+u2IcVdCbweWRx3fRRKI+nFSGYZICMnpGMeOtIdAD1XCwhxuG/bYMQTXGFju+lJLN3NIxEgwwVURLOJ6Syw==
   dependencies:
     link-module-alias "^1.2.0"
 

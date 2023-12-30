@@ -58,15 +58,15 @@ export const reply_with_media =
 
 		sizeInBytes = sizeInBytes || Buffer.from(data, 'base64').length;
 
-		if (sizeInBytes > __MAX_VIDEO_SIZE__) {
-			return whatsappBoundary.sendMessage(
-				payload.chatId,
-				'Error: Media file too large, max size 16 MB',
-				{
-					quotedMessageId: payload.quoteId,
-				}
-			);
-		}
+		// if (sizeInBytes > __MAX_VIDEO_SIZE__) {
+		// 	return whatsappBoundary.sendMessage(
+		// 		payload.chatId,
+		// 		'Error: Media file too large, max size 16 MB',
+		// 		{
+		// 			quotedMessageId: payload.quoteId,
+		// 		}
+		// 	);
+		// }
 
 		/**
 		 * Creating proper instance for media whether its from b64 or url;
@@ -75,8 +75,8 @@ export const reply_with_media =
 			payload.media.transportType === 'b64'
 				? new MessageMedia(mimeType, data, fileName, sizeInBytes)
 				: await MessageMedia.fromUrl(payload.media.data, {
-						unsafeMime: true,
-				  });
+					unsafeMime: true,
+				});
 
 		try {
 			whatsappBoundary.sendMessage(payload.chatId, messageMedia, {

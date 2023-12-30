@@ -6,6 +6,7 @@ import {
 	getContactProfilePhoto,
 	getMessageById,
 } from 'src/Client/Getters';
+import { getChatInfo } from 'src/Client/Getters/Chat';
 import { Client } from 'whatsapp-web.js';
 
 type RequestData = AskResourcePayload['request']['data'];
@@ -18,24 +19,25 @@ const resourceMap: ResourceMap = {
 	contact_by_id: getContactById,
 	contact_profile_pic: getContactProfilePhoto,
 	message_by_id: getMessageById,
+	chat_info: getChatInfo,
 };
 
 export const ask_resource =
 	(whatsappBoundary: Client, socket: Socket) =>
-	async (payload: AskResourcePayload) => {
-		const resourceToBeFound = payload.request.resource;
-		const resourceGetterFn = resourceMap[resourceToBeFound];
+		async (payload: AskResourcePayload) => {
+			const resourceToBeFound = payload.request.resource;
+			const resourceGetterFn = resourceMap[resourceToBeFound];
 
-		if (!resourceGetterFn) {
-			return undefined;
-		}
+			if (!resourceGetterFn) {
+				return undefined;
+			}
 
-		const resource = await resourceGetterFn(whatsappBoundary)(payload.request.data);
+			const resource = await resourceGetterFn(whatsappBoundary)(payload.request.data);
 
-		const responsePayload: ProvideResourcePayload = {
-			...payload,
-			response: resource,
-			timestamp: new Date().getTime(),
+			const responsePayload: ProvideResourcePayload = {
+				...payload,
+				response: resource,
+				timestamp: new Date().getTime(),
+			};
+			socket.emit('reply_resource', responsePayload);
 		};
-		socket.emit('reply_resource', responsePayload);
-	};
