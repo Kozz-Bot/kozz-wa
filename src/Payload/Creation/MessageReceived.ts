@@ -13,10 +13,12 @@ const typeMap: Partial<{
 	sticker: 'STICKER',
 };
 
+// This function is getting bigger than I like. Maybe I can abstract some of it
 export const createMessageReceivedPayload = async (
 	message: Message | undefined,
 	whatsappBoundary: Client
 ): Promise<MessageReceived | undefined> => {
+	// Why is this even necessary? 
 	if (!message) return undefined;
 
 	const quotedMessage = await message.getQuotedMessage();
@@ -32,9 +34,22 @@ export const createMessageReceivedPayload = async (
 		});
 	};
 
+	const taggedContactsPayload = await Promise.all(
+		taggedContacts?.map(tag => createTaggedContactPayload(tag)) || []
+	);
+
+	const taggedContactsBody = message.body;
+
+	// [TODO] - This is bugged. Had to add this ternary to avoid crashing the app. I'll debug it later. 
+	taggedContactsPayload.forEach(contact => {
+		contact.id.match(/@[0-9]{8,18}/) ? taggedContactsBody.replace(contact.id.match(/@[0-9]{8,18}/)![0], contact.publicName) : undefined;
+	})
+
 	return {
 		platform: 'WA',
-		body: message.body.toLowerCase(),
+		body: message.body,
+		santizedBody: message.body.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, ""),
+		taggedConctactFriendlyBody: taggedContactsBody,
 		from: createContatcPayload(await message.getContact()).id,
 		to: message.fromMe ? chat.id._serialized : message.from,
 		timestamp: message.timestamp * 1000 || new Date().getTime(),
@@ -51,9 +66,7 @@ export const createMessageReceivedPayload = async (
 		messageType: getMessageType(message),
 		// the lib does not type the raw data
 		isViewOnce: ((message.rawData as any).isViewOnce as boolean) || false,
-		taggedContacts: await Promise.all(
-			taggedContacts?.map(tag => createTaggedContactPayload(tag)) || []
-		),
+		taggedContacts: taggedContactsPayload,
 	};
 };
 

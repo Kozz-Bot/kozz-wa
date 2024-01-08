@@ -42,7 +42,7 @@ export const reply_with_sticker =
 		);
 	};
 
-const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 16; // 16 megabytes
+const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 60; // 16 megabytes
 
 export const reply_with_media =
 	(whatsappBoundary: Client, _: Socket) => async (payload: SendMessagePayload) => {
@@ -58,15 +58,15 @@ export const reply_with_media =
 
 		sizeInBytes = sizeInBytes || Buffer.from(data, 'base64').length;
 
-		// if (sizeInBytes > __MAX_VIDEO_SIZE__) {
-		// 	return whatsappBoundary.sendMessage(
-		// 		payload.chatId,
-		// 		'Error: Media file too large, max size 16 MB',
-		// 		{
-		// 			quotedMessageId: payload.quoteId,
-		// 		}
-		// 	);
-		// }
+		if (sizeInBytes > __MAX_VIDEO_SIZE__) {
+			return whatsappBoundary.sendMessage(
+				payload.chatId,
+				'Error: Media file too large, max size 60 MB',
+				{
+					quotedMessageId: payload.quoteId,
+				}
+			);
+		}
 
 		/**
 		 * Creating proper instance for media whether its from b64 or url;

@@ -3,7 +3,7 @@ import { Socket } from 'socket.io-client';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 import fs from 'fs/promises';
 
-const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 16; // 16 megabytes
+const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 60; // 16 megabytes
 
 export const send_message =
 	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
@@ -29,7 +29,7 @@ export const send_message_with_media =
 		if (sizeInBytes > __MAX_VIDEO_SIZE__) {
 			return whatsappBoundary.sendMessage(
 				payload.chatId,
-				'Error: Media file too large, max size 16 MB',
+				'Error: Media file too large, max size 60 MB',
 				{
 					quotedMessageId: payload.quoteId,
 				}
