@@ -1,126 +1,15 @@
 diff --git a/node_modules/whatsapp-web.js/index.d.ts b/node_modules/whatsapp-web.js/index.d.ts
-index 38014be..3eb06e9 100644
+index 329a419..0ac6b86 100644
 --- a/node_modules/whatsapp-web.js/index.d.ts
 +++ b/node_modules/whatsapp-web.js/index.d.ts
-@@ -21,7 +21,7 @@ declare namespace WAWebJS {
-         acceptInvite(inviteCode: string): Promise<string>
- 
-         /** Accepts a private invitation to join a group (v4 invite) */
--        acceptGroupV4Invite: (inviteV4: InviteV4Data) => Promise<{status: number}>
-+        acceptGroupV4Invite: (inviteV4: InviteV4Data) => Promise<{ status: number }>
- 
-         /**Returns an object with information about the invite code's group */
-         getInviteInfo(inviteCode: string): Promise<object>
-@@ -36,7 +36,7 @@ declare namespace WAWebJS {
-         unpinChat(chatId: string): Promise<boolean>
- 
-         /** Creates a new group */
--        createGroup(title: string, participants?: string | Contact | Contact[] | string[], options?: CreateGroupOptions): Promise<CreateGroupResult|string>
-+        createGroup(title: string, participants?: string | Contact | Contact[] | string[], options?: CreateGroupOptions): Promise<CreateGroupResult | string>
- 
-         /** Closes the client */
-         destroy(): Promise<void>
-@@ -72,7 +72,7 @@ declare namespace WAWebJS {
-         getLabels(): Promise<Label[]>
- 
-         /** Change labels in chats  */
--        addOrRemoveLabels(labelIds: Array<number|string>, chatIds: Array<string>): Promise<void>
-+        addOrRemoveLabels(labelIds: Array<number | string>, chatIds: Array<string>): Promise<void>
- 
-         /** Get Label instance by ID */
-         getLabelById(labelId: string): Promise<Label>
-@@ -235,11 +235,11 @@ declare namespace WAWebJS {
-             /** Message with more information about the event. */
-             message: Message,
-             /** Old user's id. */
--            oldId : String,
-+            oldId: String,
-             /** New user's id. */
--            newId : String,
-+            newId: String,
-             /** Indicates if a contact or a group participant changed their phone number. */
--            isContact : Boolean
-+            isContact: Boolean
-         ) => void): this
- 
-         /** Emitted when media has been uploaded for a message sent by the client */
-@@ -393,15 +393,15 @@ declare namespace WAWebJS {
-         authTimeoutMs?: number,
-         /** Puppeteer launch options. View docs here: https://github.com/puppeteer/puppeteer/ */
-         puppeteer?: puppeteer.PuppeteerNodeLaunchOptions & puppeteer.ConnectOptions
--		/** Determines how to save and restore sessions. Will use LegacySessionAuth if options.session is set. Otherwise, NoAuth will be used. */
-+        /** Determines how to save and restore sessions. Will use LegacySessionAuth if options.session is set. Otherwise, NoAuth will be used. */
-         authStrategy?: AuthStrategy,
-         /** The version of WhatsApp Web to use. Use options.webVersionCache to configure how the version is retrieved. */
-         webVersion?: string,
-         /**  Determines how to retrieve the WhatsApp Web version specified in options.webVersion. */
-         webVersionCache?: WebCacheOptions,
-         /** How many times should the qrcode be refreshed before giving up
--		 * @default 0 (disabled) */
--		qrMaxRetries?: number,
-+         * @default 0 (disabled) */
-+        qrMaxRetries?: number,
-         /** 
-          * @deprecated This option should be set directly on the LegacySessionAuth
-          */
-@@ -423,7 +423,7 @@ declare namespace WAWebJS {
-          * @default 'ffmpeg' */
-         ffmpegPath?: string,
-         /** Object with proxy autentication requirements @default: undefined */
--        proxyAuthentication?: {username: string, password: string} | undefined
-+        proxyAuthentication?: { username: string, password: string } | undefined
-     }
- 
-     export interface LocalWebCacheOptions {
-@@ -467,7 +467,7 @@ declare namespace WAWebJS {
-      * No session restoring functionality
-      * Will need to authenticate via QR code every time
-      */
--    export class NoAuth extends AuthStrategy {}
-+    export class NoAuth extends AuthStrategy { }
- 
-     /**
-      * Local directory-based authentication
-@@ -484,7 +484,7 @@ declare namespace WAWebJS {
-     /**
-      * Remote-based authentication
-      */
--     export class RemoteAuth extends AuthStrategy {
-+    export class RemoteAuth extends AuthStrategy {
-         public clientId?: string;
-         public dataPath?: string;
-         constructor(options?: {
-@@ -509,7 +509,7 @@ declare namespace WAWebJS {
-      * Legacy session auth strategy
-      * Not compatible with multi-device accounts.
-      */
--     export class LegacySessionAuth extends AuthStrategy {
-+    export class LegacySessionAuth extends AuthStrategy {
-         constructor(options?: {
-             session?: ClientSession,
-             restartOnAuthFail?: boolean,
-@@ -734,11 +734,11 @@ declare namespace WAWebJS {
-     }
- 
-     export type MessageInfo = {
--        delivery: Array<{id: ContactId, t: number}>,
-+        delivery: Array<{ id: ContactId, t: number }>,
-         deliveryRemaining: number,
--        played: Array<{id: ContactId, t: number}>,
-+        played: Array<{ id: ContactId, t: number }>,
-         playedRemaining: number,
--        read: Array<{id: ContactId, t: number}>,
-+        read: Array<{ id: ContactId, t: number }>,
-         readRemaining: number
-     }
- 
-@@ -780,149 +780,150 @@ declare namespace WAWebJS {
+@@ -808,56 +808,58 @@ declare namespace WAWebJS {
       *   mentionedIds: []
       * }
       */
 -    export interface Message {
 +    export class Message {
-+        constructor(client: Client, data: any);
++        constructor(client: Client, messageData: any): Message;
++
          /** ACK status for the message */
 -        ack: MessageAck,
 +        ack: MessageAck;
@@ -191,8 +80,17 @@ index 38014be..3eb06e9 100644
 -        mediaKey?: string,
 +        mediaKey?: string;
          /** Indicates the mentions in the message body. */
--        mentionedIds: [],
-+        mentionedIds: [];
+-        mentionedIds: ChatId[],
++        mentionedIds: ChatId[];
+         /** Indicates whether there are group mentions in the message body */
+         groupMentions: {
+             groupSubject: string;
+@@ -866,106 +868,106 @@ declare namespace WAWebJS {
+                 user: string;
+                 _serialized: string;
+             };
+-        }[],
++        }[];
          /** Unix timestamp for when the message was created */
 -        timestamp: number,
 +        timestamp: number;
@@ -261,7 +159,7 @@ index 38014be..3eb06e9 100644
 +        reload: () => Promise<Message>;
          /** Accept the Group V4 Invite in message */
 -        acceptGroupV4Invite: () => Promise<{status: number}>,
-+        acceptGroupV4Invite: () => Promise<{ status: number }>;
++        acceptGroupV4Invite: () => Promise<{status: number}>;
          /** Deletes the message from the chat */
 -        delete: (everyone?: boolean) => Promise<void>,
 +        delete: (everyone?: boolean) => Promise<void>;
@@ -277,6 +175,9 @@ index 38014be..3eb06e9 100644
          /** Returns the Contacts mentioned in this message */
 -        getMentions: () => Promise<Contact[]>,
 +        getMentions: () => Promise<Contact[]>;
+         /** Returns groups mentioned in this message */
+-        getGroupMentions: () => Promise<GroupChat[]|[]>,
++        getGroupMentions: () => Promise<GroupChat[]|[]>;
          /** Returns the quoted message, if any */
 -        getQuotedMessage: () => Promise<Message>,
 +        getQuotedMessage: () => Promise<Message>;
@@ -301,6 +202,12 @@ index 38014be..3eb06e9 100644
          /** Unstar this message */
 -        unstar: () => Promise<void>,
 +        unstar: () => Promise<void>;
+         /** Pins the message (group admins can pin messages of all group members) */
+-        pin: (duration: number) => Promise<boolean>,
++        pin: (duration: number) => Promise<boolean>;
+         /** Unpins the message (group admins can unpin messages of all group members) */
+-        unpin: () => Promise<boolean>,
++        unpin: () => Promise<boolean>;
          /** Get information about message delivery status */
 -        getInfo: () => Promise<MessageInfo | null>,
 +        getInfo: () => Promise<MessageInfo | null>;
@@ -325,54 +232,3 @@ index 38014be..3eb06e9 100644
      }
  
      /** ID that represents a message */
-@@ -1332,7 +1333,7 @@ declare namespace WAWebJS {
-          * will be added). If sleep is a number, a sleep time equal to its value will be added
-          * @default [250,500]
-          */
--        sleep?: Array<number>|number,
-+        sleep?: Array<number> | number,
-         /**
-          * If true, the inviteV4 will be sent to those participants
-          * who have restricted others from being automatically added to groups,
-@@ -1389,7 +1390,7 @@ declare namespace WAWebJS {
-         /** Group participants */
-         participants: Array<GroupParticipant>;
-         /** Adds a list of participants by ID to the group */
--        addParticipants: (participantIds: string|string[], options?: AddParticipantsOptions) => Promise<Object.<string, AddParticipantsResult>|string>;
-+        addParticipants: (participantIds: string | string[], options?: AddParticipantsOptions) => Promise<Object.<string, AddParticipantsResult> | string>;
-         /** Removes a list of participants by ID to the group */
-         removeParticipants: (participantIds: string[]) => Promise<{ status: number }>;
-         /** Promotes participants by IDs to admins */
-@@ -1555,17 +1556,17 @@ declare namespace WAWebJS {
-         /** Payment currency */
-         paymentCurrency: string,
-         /** Payment ammount  */
--        paymentAmount1000 : number,
-+        paymentAmount1000: number,
-         /** Payment receiver */
--        paymentMessageReceiverJid : object,
-+        paymentMessageReceiverJid: object,
-         /** Payment transaction timestamp */
--        paymentTransactionTimestamp : number,
-+        paymentTransactionTimestamp: number,
-         /** Payment paymentStatus */
--        paymentStatus : number,
-+        paymentStatus: number,
-         /** Integer that represents the payment Text */
--        paymentTxnStatus  : number,
-+        paymentTxnStatus: number,
-         /** The note sent with the payment */
--        paymentNote  : string;
-+        paymentNote: string;
-     }
- 
-     /**
-@@ -1622,7 +1623,7 @@ declare namespace WAWebJS {
-     /** Message type Buttons */
-     export class Buttons {
-         body: string | MessageMedia
--        buttons: Array<{ buttonId: string; buttonText: {displayText: string}; type: number }>
-+        buttons: Array<{ buttonId: string; buttonText: { displayText: string }; type: number }>
-         title?: string | null
-         footer?: string | null
- 

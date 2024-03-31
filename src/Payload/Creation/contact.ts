@@ -9,5 +9,6 @@ export const createContatcPayload = (contact: Contact): ContactPayload => {
 		isBlocked: contact.isBlocked,
 		hostAdded: contact.isMyContact,
 		isGroup: contact.isGroup,
+		isHostAccount: contact.isMe,
 	};
 };

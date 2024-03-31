@@ -2,21 +2,26 @@ import { SendMessagePayload } from 'kozz-types';
 import { Socket } from 'socket.io-client';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 import fs from 'fs/promises';
+import { parseAndProcessInlineCommands } from 'src/util/inlineCommandHandlers';
 
 const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 60; // 16 megabytes
 
 export const send_message =
 	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
-		whatsappBoundary.sendMessage(payload.chatId, payload.body);
+		const { companion, stringValue } = parseAndProcessInlineCommands(payload.body);
+
+		whatsappBoundary.sendMessage(payload.chatId, stringValue, {
+			mentions: companion.mentions,
+		});
 	};
 
 export const send_message_with_media =
 	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
-		console.log('requesting reply with media');
+		const { companion, stringValue } = parseAndProcessInlineCommands(payload.body);
 
 		if (!payload.media) {
 			return console.warn(
-				'[ERROR]: Evoked reply_with_media with payload without media'
+				'[ERROR]: Evoked send_message_with_media with payload without media'
 			);
 		}
 
@@ -42,7 +47,8 @@ export const send_message_with_media =
 				new MessageMedia(mimeType, data, fileName, sizeInBytes),
 				{
 					quotedMessageId: payload.quoteId,
-					caption: payload.body,
+					caption: stringValue,
+					mentions: companion.mentions,
 				}
 			);
 		} catch (e) {

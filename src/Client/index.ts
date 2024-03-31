@@ -16,7 +16,12 @@ const createBoundary = (socket: WaSocket) => {
 		authStrategy: new LocalAuth(),
 		puppeteer: {
 			executablePath: chromePath,
-			headless: true,
+			headless: false,
+		},
+		webVersionCache: {
+			type: 'remote',
+			remotePath:
+				'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.2.html',
 		},
 	});
 
@@ -46,7 +51,7 @@ const createBoundary = (socket: WaSocket) => {
 	whatsappBoundary.on('group_leave', onUserJoinedGroup(whatsappBoundary, socket));
 
 	// [TODO]: Make "host_metioned" a forwardable event.
-	whatsappBoundary.on('message_create', async message => { });
+	whatsappBoundary.on('message_create', async message => {});
 
 	whatsappBoundary.on('message_create', async message => {
 		onMessageReceived(socket, whatsappBoundary)(message);

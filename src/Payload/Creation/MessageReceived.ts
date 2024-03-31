@@ -18,7 +18,7 @@ export const createMessageReceivedPayload = async (
 	message: Message | undefined,
 	whatsappBoundary: Client
 ): Promise<MessageReceived | undefined> => {
-	// Why is this even necessary? 
+	// Why is this even necessary?
 	if (!message) return undefined;
 
 	const quotedMessage = await message.getQuotedMessage();
@@ -40,15 +40,23 @@ export const createMessageReceivedPayload = async (
 
 	const taggedContactsBody = message.body;
 
-	// [TODO] - This is bugged. Had to add this ternary to avoid crashing the app. I'll debug it later. 
+	// [TODO] - This is bugged. Had to add this ternary to avoid crashing the app. I'll debug it later.
 	taggedContactsPayload.forEach(contact => {
-		contact.id.match(/@[0-9]{8,18}/) ? taggedContactsBody.replace(contact.id.match(/@[0-9]{8,18}/)![0], contact.publicName) : undefined;
-	})
+		contact.id.match(/@[0-9]{8,18}/)
+			? taggedContactsBody.replace(
+					contact.id.match(/@[0-9]{8,18}/)![0],
+					contact.publicName
+			  )
+			: undefined;
+	});
 
 	return {
 		platform: 'WA',
 		body: message.body,
-		santizedBody: message.body.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, ""),
+		santizedBody: message.body
+			.toLowerCase()
+			.normalize('NFKD')
+			.replace(/[\u0300-\u036f]/g, ''),
 		taggedConctactFriendlyBody: taggedContactsBody,
 		from: createContatcPayload(await message.getContact()).id,
 		to: message.fromMe ? chat.id._serialized : message.from,
@@ -83,6 +91,7 @@ export const createMediaReceivedPayload = async (
 				fileName: messageMedia.filename || null,
 				sizeInBytes: messageMedia.filesize || null,
 				transportType: 'b64',
+				stickerTags: undefined,
 			};
 		}
 	} catch (e) {

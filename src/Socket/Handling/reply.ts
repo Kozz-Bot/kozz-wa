@@ -3,6 +3,7 @@ import { getFormattedDateAndTime } from 'src/util/Time';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 import fs from 'fs/promises';
 import { Socket } from 'socket.io-client';
+import { parseAndProcessInlineCommands } from 'src/util/inlineCommandHandlers';
 
 /**
  * Reply a given message with plain text
@@ -11,8 +12,11 @@ import { Socket } from 'socket.io-client';
  */
 export const reply_with_text =
 	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
-		whatsappBoundary.sendMessage(payload.chatId, payload.body, {
+		const { companion, stringValue } = parseAndProcessInlineCommands(payload.body);
+
+		whatsappBoundary.sendMessage(payload.chatId, stringValue, {
 			quotedMessageId: payload.quoteId,
+			mentions: companion.mentions,
 		});
 	};
 
@@ -23,7 +27,7 @@ export const reply_with_sticker =
 				'[ERROR]: Evoked replyWithSticker with payload without media'
 			);
 		}
-		const { data, fileName, mimeType, sizeInBytes } = payload.media;
+		const { data, fileName, mimeType, sizeInBytes, stickerTags } = payload.media;
 
 		whatsappBoundary.sendMessage(
 			payload.chatId,
@@ -37,7 +41,7 @@ export const reply_with_sticker =
 					`${getFormattedDateAndTime()}`,
 				].join('\n'),
 				stickerAuthor: 'Kozz-Bot\ndo Tramonta',
-				stickerCategories: ['🥴'],
+				stickerCategories: stickerTags,
 			}
 		);
 	};
@@ -46,6 +50,8 @@ const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 60; // 16 megabytes
 
 export const reply_with_media =
 	(whatsappBoundary: Client, _: Socket) => async (payload: SendMessagePayload) => {
+		const { companion, stringValue } = parseAndProcessInlineCommands(payload.body);
+
 		if (!payload.media) {
 			return console.warn(
 				'[ERROR]: Evoked reply_with_media with payload without media'
@@ -75,13 +81,14 @@ export const reply_with_media =
 			payload.media.transportType === 'b64'
 				? new MessageMedia(mimeType, data, fileName, sizeInBytes)
 				: await MessageMedia.fromUrl(payload.media.data, {
-					unsafeMime: true,
-				});
+						unsafeMime: true,
+				  });
 
 		try {
 			whatsappBoundary.sendMessage(payload.chatId, messageMedia, {
 				quotedMessageId: payload.quoteId,
-				caption: payload.body,
+				caption: stringValue,
+				mentions: companion.mentions,
 			});
 		} catch (e) {
 			fs.writeFile(tempFilePath, data, {
