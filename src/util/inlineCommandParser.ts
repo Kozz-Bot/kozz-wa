@@ -46,13 +46,12 @@ export const parseMessageBody = (string: string) => {
 	);
 
 	if (isError) {
-		console.warn(
-			`Error while trying to parse inline command ${
-				stringToBeParsed.slice(0, 50) + '...'
-			}, string left is ${stringLeft.slice(0, 50) + '...'}`
-		);
-		console.warn(errorStack);
-		return string;
+		return [
+			{
+				type: 'string',
+				value: string,
+			},
+		];
 	}
 
 	return result;

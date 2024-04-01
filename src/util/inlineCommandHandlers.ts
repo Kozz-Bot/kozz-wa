@@ -1,4 +1,3 @@
-import { Client } from 'whatsapp-web.js';
 import { Command, parseMessageBody, PlainText } from './inlineCommandParser';
 
 type CompanionObject = {
