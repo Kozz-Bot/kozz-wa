@@ -18,11 +18,6 @@ const createBoundary = (socket: WaSocket) => {
 			executablePath: chromePath,
 			headless: false,
 		},
-		webVersionCache: {
-			type: 'remote',
-			remotePath:
-				'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2409.2.html',
-		},
 	});
 
 	whatsappBoundary.on('qr', qr => {
