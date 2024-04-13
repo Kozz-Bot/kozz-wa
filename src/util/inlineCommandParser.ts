@@ -5,7 +5,7 @@ export type PlainText = {
 	value: string;
 };
 
-export type Command<N extends string = '', T extends Record<string, any> = {}> = {
+export type Command<N extends string, T extends Record<string, any> = {}> = {
 	type: 'command';
 	commandName: N;
 	commandData: T;
@@ -40,19 +40,16 @@ const stringParser = T.transform(
 const parser = T.atLeastOne(T.choice([stringParser, commandParser]));
 
 export const parseMessageBody = (string: string) => {
-	const { isError, result, errorStack, stringLeft, stringToBeParsed } = T.parse(
-		string,
-		parser
-	);
+	const { isError, result } = T.parse(string, parser);
 
 	if (isError) {
 		return [
 			{
 				type: 'string',
 				value: string,
-			},
+			} as const,
 		];
 	}
 
-	return result;
+	return result as (PlainText | Command<any>)[];
 };

@@ -4,35 +4,49 @@ type CompanionObject = {
 	mentions: string[];
 };
 
-type InlineCommandHandler = (
+type CommandArgs = {
+	mention: { id: string };
+	invisiblemention: { id: string };
+};
+
+type InlineCommandHandler<T extends Record<string, any>> = (
 	companion: CompanionObject,
-	data: Command<any, any>['commandData']
+	data: Command<any, T>['commandData']
 ) => {
 	companion: CompanionObject;
+	/**
+	 * This string will substitute the inline command payload
+	 */
 	stringValue: string;
 };
 
-const isPlainText = (resultItem: PlainText | Command): resultItem is PlainText => {
+type CommandMap = {
+	[key in keyof CommandArgs]: InlineCommandHandler<CommandArgs[key]>;
+};
+
+const isPlainText = (
+	resultItem: PlainText | Command<keyof CommandArgs>
+): resultItem is PlainText => {
 	return resultItem.type === 'string';
 };
 
-const commandMap: Record<string, InlineCommandHandler> = {
-	mention: (
-		companion: CompanionObject,
-		{ id }: Command<'mention', { id: string }>['commandData']
-	) => {
-		const newCompanion: CompanionObject = {
+const commandMap: CommandMap = {
+	mention: (companion, { id }) => ({
+		companion: {
 			mentions: [...companion.mentions, id],
-		};
-		return {
-			companion: newCompanion,
-			stringValue: '@' + id.replace('@c.us', ''),
-		};
-	},
+		},
+		stringValue: '@' + id.replace('@c.us', ''),
+	}),
+	invisiblemention: (comapanion, { id }) => ({
+		companion: {
+			mentions: [...comapanion.mentions, id],
+		},
+		stringValue: '',
+	}),
 };
 
 const processResultItem = (
-	resultItem: PlainText | Command,
+	resultItem: PlainText | Command<keyof CommandMap, any>,
 	companionObject: CompanionObject = {
 		mentions: [],
 	}
@@ -43,8 +57,7 @@ const processResultItem = (
 			stringValue: resultItem['value'],
 		};
 	} else {
-		const commandHandler = commandMap[resultItem.commandName];
-		if (!commandHandler) {
+		if (!(resultItem.commandName in commandMap)) {
 			console.warn(
 				`Tried to handle inline-command with name ${resultItem.commandName} but there is not a handler for this.`
 			);
@@ -52,13 +65,17 @@ const processResultItem = (
 				companion: companionObject,
 				stringValue: '',
 			};
-		} else {
-			return commandHandler(companionObject, resultItem.commandData);
 		}
+		return commandMap[resultItem.commandName](
+			companionObject,
+			resultItem.commandData
+		);
 	}
 };
 
-const processAllResults = (results: (PlainText | Command)[]) => {
+const processAllResults = (
+	results: (PlainText | Command<keyof CommandMap, any>)[]
+) => {
 	return results.reduce(
 		(acc, item) => {
 			const { companion, stringValue } = processResultItem(item, acc.companion);
@@ -72,11 +89,11 @@ const processAllResults = (results: (PlainText | Command)[]) => {
 				mentions: [],
 			},
 			stringValue: '',
-		} as ReturnType<InlineCommandHandler>
+		} as ReturnType<InlineCommandHandler<{}>>
 	);
 };
 
 export const parseAndProcessInlineCommands = (messageBody: string) => {
-	const results: (PlainText | Command)[] = parseMessageBody(messageBody);
+	const results = parseMessageBody(messageBody);
 	return processAllResults(results);
 };

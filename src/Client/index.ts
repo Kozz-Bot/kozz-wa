@@ -16,7 +16,7 @@ const createBoundary = (socket: WaSocket) => {
 		authStrategy: new LocalAuth(),
 		puppeteer: {
 			executablePath: chromePath,
-			headless: false,
+			headless: true,
 		},
 	});
 
