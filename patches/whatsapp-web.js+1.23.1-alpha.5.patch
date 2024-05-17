@@ -232,3 +232,279 @@ index 329a419..0ac6b86 100644
      }
  
      /** ID that represents a message */
+diff --git a/node_modules/whatsapp-web.js/src/Client.js b/node_modules/whatsapp-web.js/src/Client.js
+index 14a7804..5a1c57d 100644
+--- a/node_modules/whatsapp-web.js/src/Client.js
++++ b/node_modules/whatsapp-web.js/src/Client.js
+@@ -62,7 +62,7 @@ class Client extends EventEmitter {
+ 
+         this.options = Util.mergeDefault(DefaultOptions, options);
+ 
+-        if(!this.options.authStrategy) {
++        if (!this.options.authStrategy) {
+             this.authStrategy = new NoAuth();
+         } else {
+             this.authStrategy = this.options.authStrategy;
+@@ -92,13 +92,13 @@ class Client extends EventEmitter {
+             page = await browser.newPage();
+         } else {
+             const browserArgs = [...(puppeteerOpts.args || [])];
+-            if(!browserArgs.find(arg => arg.includes('--user-agent'))) {
++            if (!browserArgs.find(arg => arg.includes('--user-agent'))) {
+                 browserArgs.push(`--user-agent=${this.options.userAgent}`);
+             }
+             // navigator.webdriver fix
+             browserArgs.push('--disable-blink-features=AutomationControlled');
+ 
+-            browser = await puppeteer.launch({...puppeteerOpts, args: browserArgs});
++            browser = await puppeteer.launch({ ...puppeteerOpts, args: browserArgs });
+             page = (await browser.pages())[0];
+         }
+ 
+@@ -203,7 +203,7 @@ class Client extends EventEmitter {
+         // Scan-qrcode selector was found. Needs authentication
+         if (needAuthentication) {
+             const { failed, failureEventPayload, restart } = await this.authStrategy.onAuthenticationNeeded();
+-            if(failed) {
++            if (failed) {
+                 /**
+                  * Emitted when there has been an error while trying to restore an existing session
+                  * @event Client#auth_failure
+@@ -268,7 +268,7 @@ class Client extends EventEmitter {
+             // Wait for code scan
+             try {
+                 await page.waitForSelector(INTRO_IMG_SELECTOR, { timeout: 0 });
+-            } catch(error) {
++            } catch (error) {
+                 if (
+                     error.name === 'ProtocolError' &&
+                     error.message &&
+@@ -534,7 +534,7 @@ class Client extends EventEmitter {
+ 
+         });
+ 
+-        await page.exposeFunction('onChatUnreadCountEvent', async (data) =>{
++        await page.exposeFunction('onChatUnreadCountEvent', async (data) => {
+             const chat = await this.getChatById(data.id);
+ 
+             /**
+@@ -669,7 +669,7 @@ class Client extends EventEmitter {
+ 
+         await page.exposeFunction('onEditMessageEvent', (msg, newBody, prevBody) => {
+ 
+-            if(msg.type === 'revoked'){
++            if (msg.type === 'revoked') {
+                 return;
+             }
+             /**
+@@ -706,7 +706,7 @@ class Client extends EventEmitter {
+             window.Store.Chat.on('change:archive', async (chat, currState, prevState) => { window.onArchiveChatEvent(await window.WWebJS.getChatModel(chat), currState, prevState); });
+             window.Store.Msg.on('add', (msg) => {
+                 if (msg.isNewMsg) {
+-                    if(msg.type === 'ciphertext') {
++                    if (msg.type === 'ciphertext') {
+                         // defer message event until ciphertext is resolved (type changed)
+                         msg.once('change:type', (_msg) => window.onAddMessageEvent(window.WWebJS.getMessageModel(_msg)));
+                         window.onAddMessageCiphertextEvent(window.WWebJS.getMessageModel(msg));
+@@ -715,7 +715,7 @@ class Client extends EventEmitter {
+                     }
+                 }
+             });
+-            window.Store.Chat.on('change:unreadCount', (chat) => {window.onChatUnreadCountEvent(chat);});
++            window.Store.Chat.on('change:unreadCount', (chat) => { window.onChatUnreadCountEvent(chat); });
+ 
+             {
+                 const module = window.Store.createOrUpdateReactionsModule;
+@@ -726,7 +726,7 @@ class Client extends EventEmitter {
+                         const parentMsgKey = window.Store.MsgKey.fromString(reaction.parentMsgKey);
+                         const timestamp = reaction.timestamp / 1000;
+ 
+-                        return {...reaction, msgKey, parentMsgKey, timestamp };
++                        return { ...reaction, msgKey, parentMsgKey, timestamp };
+                     }));
+ 
+                     return ogMethod(...args);
+@@ -744,7 +744,7 @@ class Client extends EventEmitter {
+         // Disconnect when navigating away when in PAIRING state (detect logout)
+         this.pupPage.on('framenavigated', async () => {
+             const appState = await this.getState();
+-            if(!appState || appState === WAState.PAIRING) {
++            if (!appState || appState === WAState.PAIRING) {
+                 await this.authStrategy.disconnect();
+                 this.emit(Events.DISCONNECTED, 'NAVIGATION');
+                 await this.destroy();
+@@ -759,10 +759,10 @@ class Client extends EventEmitter {
+         const requestedVersion = this.options.webVersion;
+         const versionContent = await webCache.resolve(requestedVersion);
+ 
+-        if(versionContent) {
++        if (versionContent) {
+             await this.pupPage.setRequestInterception(true);
+             this.pupPage.on('request', async (req) => {
+-                if(req.url() === WhatsWebURL) {
++                if (req.url() === WhatsWebURL) {
+                     req.respond({
+                         status: 200,
+                         contentType: 'text/html',
+@@ -774,7 +774,7 @@ class Client extends EventEmitter {
+             });
+         } else {
+             this.pupPage.on('response', async (res) => {
+-                if(res.ok() && res.url() === WhatsWebURL) {
++                if (res.ok() && res.url() === WhatsWebURL) {
+                     const indexHtml = await res.text();
+                     this.currentIndexHtml = indexHtml;
+                 }
+@@ -869,6 +869,8 @@ class Client extends EventEmitter {
+      * @returns {Promise<Message>} Message that was just sent
+      */
+     async sendMessage(chatId, content, options = {}) {
++
++
+         if (options.mentions) {
+             !Array.isArray(options.mentions) && (options.mentions = [options.mentions]);
+             if (options.mentions.some((possiblyContact) => possiblyContact instanceof Contact)) {
+@@ -898,12 +900,12 @@ class Client extends EventEmitter {
+         if (content instanceof MessageMedia) {
+             internalOptions.attachment = content;
+             internalOptions.isViewOnce = options.isViewOnce,
+-            content = '';
++                content = '';
+         } else if (options.media instanceof MessageMedia) {
+             internalOptions.attachment = options.media;
+             internalOptions.caption = content;
+             internalOptions.isViewOnce = options.isViewOnce,
+-            content = '';
++                content = '';
+         } else if (content instanceof Location) {
+             internalOptions.location = content;
+             content = '';
+@@ -928,24 +930,29 @@ class Client extends EventEmitter {
+         if (internalOptions.sendMediaAsSticker && internalOptions.attachment) {
+             internalOptions.attachment = await Util.formatToWebpSticker(
+                 internalOptions.attachment, {
+-                    name: options.stickerName,
+-                    author: options.stickerAuthor,
+-                    categories: options.stickerCategories
+-                }, this.pupPage
++                name: options.stickerName,
++                author: options.stickerAuthor,
++                categories: options.stickerCategories
++            }, this.pupPage
+             );
+         }
+ 
+         const newMessage = await this.pupPage.evaluate(async (chatId, message, options, sendSeen) => {
+-            const chatWid = window.Store.WidFactory.createWid(chatId);
+-            const chat = await window.Store.Chat.find(chatWid);
++            try {
++                const chatWid = window.Store.WidFactory.createWid(chatId);
++                const chat = await window.Store.Chat.find(chatWid);
+ 
+ 
+-            if (sendSeen) {
+-                await window.WWebJS.sendSeen(chatId);
+-            }
++                if (sendSeen) {
++                    await window.WWebJS.sendSeen(chatId);
++                }
+ 
+-            const msg = await window.WWebJS.sendMessage(chat, message, options, sendSeen);
+-            return window.WWebJS.getMessageModel(msg);
++                const msg = await window.WWebJS.sendMessage(chat, message, options, sendSeen);
++                return window.WWebJS.getMessageModel(msg);
++            } catch (e) {
++                console.warn(e);
++                console.log({ chatId, message, options, sendSeen });
++            }
+         }, chatId, content, internalOptions, sendSeen);
+ 
+         return new Message(this, newMessage);
+@@ -1022,18 +1029,18 @@ class Client extends EventEmitter {
+     async getMessageById(messageId) {
+         const msg = await this.pupPage.evaluate(async messageId => {
+             let msg = window.Store.Msg.get(messageId);
+-            if(msg) return window.WWebJS.getMessageModel(msg);
++            if (msg) return window.WWebJS.getMessageModel(msg);
+ 
+             const params = messageId.split('_');
+-            if(params.length !== 3) throw new Error('Invalid serialized message id specified');
++            if (params.length !== 3) throw new Error('Invalid serialized message id specified');
+ 
+             let messagesObject = await window.Store.Msg.getMessagesById([messageId]);
+             if (messagesObject && messagesObject.messages.length) msg = messagesObject.messages[0];
+ 
+-            if(msg) return window.WWebJS.getMessageModel(msg);
++            if (msg) return window.WWebJS.getMessageModel(msg);
+         }, messageId);
+ 
+-        if(msg) return new Message(this, msg);
++        if (msg) return new Message(this, msg);
+         return null;
+     }
+ 
+@@ -1094,7 +1101,7 @@ class Client extends EventEmitter {
+      */
+     async setDisplayName(displayName) {
+         const couldSet = await this.pupPage.evaluate(async displayName => {
+-            if(!window.Store.Conn.canSetMyPushname()) return false;
++            if (!window.Store.Conn.canSetMyPushname()) return false;
+             await window.Store.Settings.setPushname(displayName);
+             return true;
+         }, displayName);
+@@ -1108,7 +1115,7 @@ class Client extends EventEmitter {
+      */
+     async getState() {
+         return await this.pupPage.evaluate(() => {
+-            if(!window.Store) return null;
++            if (!window.Store) return null;
+             return window.Store.AppState.state;
+         });
+     }
+@@ -1202,7 +1209,7 @@ class Client extends EventEmitter {
+         unmuteDate = unmuteDate ? unmuteDate.getTime() / 1000 : -1;
+         await this.pupPage.evaluate(async (chatId, timestamp) => {
+             let chat = await window.Store.Chat.get(chatId);
+-            await chat.mute.mute({expiration: timestamp, sendDevice:!0});
++            await chat.mute.mute({ expiration: timestamp, sendDevice: !0 });
+         }, chatId, unmuteDate || -1);
+     }
+ 
+@@ -1237,9 +1244,9 @@ class Client extends EventEmitter {
+         const profilePic = await this.pupPage.evaluate(async contactId => {
+             try {
+                 const chatWid = window.Store.WidFactory.createWid(contactId);
+-                return await window.Store.ProfilePic.profilePicFind(chatWid);
++                return await window.Store.ProfilePic.requestProfilePicFromServer(chatWid);
+             } catch (err) {
+-                if(err.name === 'ServerStatusCodeError') return undefined;
++                if (err.name === 'ServerStatusCodeError') return undefined;
+                 throw err;
+             }
+         }, contactId);
+@@ -1257,8 +1264,8 @@ class Client extends EventEmitter {
+             let contact = window.Store.Contact.get(contactId);
+             if (!contact) {
+                 const wid = window.Store.WidFactory.createUserWid(contactId);
+-                const chatConstructor = window.Store.Contact.getModelsArray().find(c=>!c.isGroup).constructor;
+-                contact = new chatConstructor({id: wid});
++                const chatConstructor = window.Store.Contact.getModelsArray().find(c => !c.isGroup).constructor;
++                contact = new chatConstructor({ id: wid });
+             }
+ 
+             if (contact.commonGroups) {
+@@ -1565,12 +1572,12 @@ class Client extends EventEmitter {
+             const labels = window.WWebJS.getLabels().filter(e => labelIds.find(l => l == e.id) !== undefined);
+             const chats = window.Store.Chat.filter(e => chatIds.includes(e.id._serialized));
+ 
+-            let actions = labels.map(label => ({id: label.id, type: 'add'}));
++            let actions = labels.map(label => ({ id: label.id, type: 'add' }));
+ 
+             chats.forEach(chat => {
+                 (chat.labels || []).forEach(n => {
+                     if (!actions.find(e => e.id == n)) {
+-                        actions.push({id: n, type: 'remove'});
++                        actions.push({ id: n, type: 'remove' });
+                     }
+                 });
+             });

@@ -17,7 +17,7 @@
 		"@types/jest": "^29.2.5",
 		"@types/qrcode-terminal": "^0.12.0",
 		"concurrently": "^7.5.0",
-		"kozz-types": "^0.1.9",
+		"kozz-types": "^0.1.10",
 		"nodemon": "^3.0.1",
 		"patch-package": "^8.0.0",
 		"typedoc": "^0.23.21",

@@ -1,21 +1,25 @@
-import { UserJoinedGroupChat, UserLeftGroupChat } from 'kozz-types';
+import { ForwardableUserLeftGroup, ForwardableUserJoinedGroup } from 'kozz-types';
 import { GroupNotification } from 'whatsapp-web.js';
 import { createContatcPayload } from '../Creation/contact';
 
 export const createUserJoinedGroupPayload = async (
 	event: GroupNotification
-): Promise<UserJoinedGroupChat> => {
-	const WWebJsContact = await event.getContact();
+): Promise<ForwardableUserJoinedGroup> => {
+	const whoAdded = createContatcPayload(await event.getContact());
+	const membersAdded = (await event.getRecipients()).map(contact =>
+		createContatcPayload(contact)
+	);
 
 	return {
 		chatId: event.chatId,
-		contact: createContatcPayload(WWebJsContact),
+		membersAdded,
+		whoAdded,
 	};
 };
 
 export const createUserLeftGroupPayload = async (
 	event: GroupNotification
-): Promise<UserLeftGroupChat> => {
+): Promise<ForwardableUserLeftGroup> => {
 	const WWebJsContact = await event.getContact();
 
 	return {
