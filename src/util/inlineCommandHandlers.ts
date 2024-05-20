@@ -57,8 +57,6 @@ const commandMap: CommandMap = {
 			mentions = chatInfo.membersList.map(member => member.id);
 		}
 
-		console.log(mentions);
-
 		return {
 			companion: {
 				...companion,
@@ -117,7 +115,7 @@ const processAllResults = async (
 			await processResultItem(currResult, companion, client, payload);
 
 		companion = newCompanion;
-		stringValue += stringValue;
+		stringValue += newString;
 	}
 
 	return {
