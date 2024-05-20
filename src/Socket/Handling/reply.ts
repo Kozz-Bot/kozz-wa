@@ -11,8 +11,12 @@ import { parseAndProcessInlineCommands } from 'src/util/inlineCommandHandlers';
  * @returns
  */
 export const reply_with_text =
-	(whatsappBoundary: Client, _: Socket) => (payload: SendMessagePayload) => {
-		const { companion, stringValue } = parseAndProcessInlineCommands(payload.body);
+	(whatsappBoundary: Client, _: Socket) => async (payload: SendMessagePayload) => {
+		const { companion, stringValue } = await parseAndProcessInlineCommands(
+			payload.body,
+			whatsappBoundary,
+			payload
+		);
 
 		whatsappBoundary.sendMessage(payload.chatId, stringValue, {
 			quotedMessageId: payload.quoteId,
@@ -50,7 +54,11 @@ const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 60; // 16 megabytes
 
 export const reply_with_media =
 	(whatsappBoundary: Client, _: Socket) => async (payload: SendMessagePayload) => {
-		const { companion, stringValue } = parseAndProcessInlineCommands(payload.body);
+		const { companion, stringValue } = await parseAndProcessInlineCommands(
+			payload.body,
+			whatsappBoundary,
+			payload
+		);
 
 		if (!payload.media) {
 			return console.warn(

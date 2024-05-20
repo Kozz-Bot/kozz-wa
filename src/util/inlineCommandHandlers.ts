@@ -1,4 +1,7 @@
+import { Client } from 'whatsapp-web.js';
 import { Command, parseMessageBody, PlainText } from './inlineCommandParser';
+import { SendMessagePayload } from 'kozz-types';
+import { getChatInfo, getGroupData } from 'src/Client/Getters/Chat';
 
 type CompanionObject = {
 	mentions: string[];
@@ -7,18 +10,21 @@ type CompanionObject = {
 type CommandArgs = {
 	mention: { id: string };
 	invisiblemention: { id: string };
+	tageveryone: {};
 };
 
 type InlineCommandHandler<T extends Record<string, any>> = (
 	companion: CompanionObject,
-	data: Command<any, T>['commandData']
-) => {
+	data: Command<any, T>['commandData'],
+	client: Client,
+	payload: SendMessagePayload
+) => Promise<{
 	companion: CompanionObject;
 	/**
 	 * This string will substitute the inline command payload
 	 */
 	stringValue: string;
-};
+}>;
 
 type CommandMap = {
 	[key in keyof CommandArgs]: InlineCommandHandler<CommandArgs[key]>;
@@ -31,25 +37,45 @@ const isPlainText = (
 };
 
 const commandMap: CommandMap = {
-	mention: (companion, { id }) => ({
+	mention: async (companion, { id }) => ({
 		companion: {
 			mentions: [...companion.mentions, id],
 		},
 		stringValue: '@' + id.replace('@c.us', ''),
 	}),
-	invisiblemention: (comapanion, { id }) => ({
+	invisiblemention: async (comapanion, { id }) => ({
 		companion: {
 			mentions: [...comapanion.mentions, id],
 		},
 		stringValue: '',
 	}),
+	tageveryone: async (companion, _, client, payload) => {
+		let mentions: string[] = [];
+
+		const chatInfo = await getChatInfo(client)({ id: payload.chatId });
+		if (chatInfo && chatInfo.isGroup) {
+			mentions = chatInfo.membersList.map(member => member.id);
+		}
+
+		console.log(mentions);
+
+		return {
+			companion: {
+				...companion,
+				mentions,
+			},
+			stringValue: '',
+		};
+	},
 };
 
-const processResultItem = (
+const processResultItem = async (
 	resultItem: PlainText | Command<keyof CommandMap, any>,
 	companionObject: CompanionObject = {
 		mentions: [],
-	}
+	},
+	client: Client,
+	payload: SendMessagePayload
 ) => {
 	if (isPlainText(resultItem)) {
 		return {
@@ -66,34 +92,45 @@ const processResultItem = (
 				stringValue: '',
 			};
 		}
-		return commandMap[resultItem.commandName](
+		return await commandMap[resultItem.commandName](
 			companionObject,
-			resultItem.commandData
+			resultItem.commandData,
+			client,
+			payload
 		);
 	}
 };
 
-const processAllResults = (
-	results: (PlainText | Command<keyof CommandMap, any>)[]
+const processAllResults = async (
+	results: (PlainText | Command<keyof CommandMap, any>)[],
+	client: Client,
+	payload: SendMessagePayload
 ) => {
-	return results.reduce(
-		(acc, item) => {
-			const { companion, stringValue } = processResultItem(item, acc.companion);
-			return {
-				companion,
-				stringValue: (acc.stringValue += stringValue),
-			};
-		},
-		{
-			companion: {
-				mentions: [],
-			},
-			stringValue: '',
-		} as ReturnType<InlineCommandHandler<{}>>
-	);
+	let companion: CompanionObject = {
+		mentions: [],
+	};
+	let stringValue = '';
+	for (let i = 0; i < results.length; i++) {
+		let currResult = results[i];
+
+		const { companion: newCompanion, stringValue: newString } =
+			await processResultItem(currResult, companion, client, payload);
+
+		companion = newCompanion;
+		stringValue += stringValue;
+	}
+
+	return {
+		companion,
+		stringValue,
+	};
 };
 
-export const parseAndProcessInlineCommands = (messageBody: string) => {
+export const parseAndProcessInlineCommands = (
+	messageBody: string,
+	client: Client,
+	payload: SendMessagePayload
+) => {
 	const results = parseMessageBody(messageBody);
-	return processAllResults(results);
+	return processAllResults(results, client, payload);
 };
