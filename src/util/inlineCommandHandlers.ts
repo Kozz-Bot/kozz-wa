@@ -1,7 +1,7 @@
 import { Client } from 'whatsapp-web.js';
 import { Command, parseMessageBody, PlainText } from './inlineCommandParser';
 import { SendMessagePayload } from 'kozz-types';
-import { getChatInfo, getGroupData } from 'src/Client/Getters/Chat';
+import { getChatInfo } from 'src/Client/Getters/Chat';
 
 type CompanionObject = {
 	mentions: string[];
