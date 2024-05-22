@@ -2,7 +2,7 @@ import { SendMessagePayload } from 'kozz-types';
 import { Socket } from 'socket.io-client';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 import fs from 'fs/promises';
-import { parseAndProcessInlineCommands } from 'src/util/inlineCommandHandlers';
+import { parseAndProcessInlineCommands } from 'src/Socket/Handling/InlineCommands/inlineCommandHandlers';
 
 const __MAX_VIDEO_SIZE__ = 1024 * 1024 * 60; // 16 megabytes
 

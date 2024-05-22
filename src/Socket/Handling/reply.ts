@@ -3,7 +3,7 @@ import { getFormattedDateAndTime } from 'src/util/Time';
 import { Client, MessageMedia } from 'whatsapp-web.js';
 import fs from 'fs/promises';
 import { Socket } from 'socket.io-client';
-import { parseAndProcessInlineCommands } from 'src/util/inlineCommandHandlers';
+import { parseAndProcessInlineCommands } from 'src/Socket/Handling/InlineCommands/inlineCommandHandlers';
 
 /**
  * Reply a given message with plain text

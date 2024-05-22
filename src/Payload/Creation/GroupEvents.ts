@@ -1,6 +1,6 @@
 import { ForwardableUserLeftGroup, ForwardableUserJoinedGroup } from 'kozz-types';
 import { GroupNotification } from 'whatsapp-web.js';
-import { createContatcPayload } from '../Creation/contact';
+import { createContatcPayload } from './contact';
 
 export const createUserJoinedGroupPayload = async (
 	event: GroupNotification

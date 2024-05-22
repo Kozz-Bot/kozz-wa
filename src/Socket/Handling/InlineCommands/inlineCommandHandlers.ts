@@ -10,7 +10,7 @@ type CompanionObject = {
 type CommandArgs = {
 	mention: { id: string };
 	invisiblemention: { id: string };
-	tageveryone: {};
+	tageveryone: { except: string[] };
 };
 
 type InlineCommandHandler<T extends Record<string, any>> = (
@@ -49,12 +49,14 @@ const commandMap: CommandMap = {
 		},
 		stringValue: '',
 	}),
-	tageveryone: async (companion, _, client, payload) => {
+	tageveryone: async (companion, { except }, client, payload) => {
 		let mentions: string[] = [];
 
 		const chatInfo = await getChatInfo(client)({ id: payload.chatId });
 		if (chatInfo && chatInfo.isGroup) {
-			mentions = chatInfo.membersList.map(member => member.id);
+			mentions = chatInfo.membersList
+				.map(member => member.id)
+				.filter(member => !except.includes(member));
 		}
 
 		return {

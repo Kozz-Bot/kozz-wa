@@ -2,7 +2,7 @@ import { Socket } from 'socket.io-client';
 import {
 	createUserJoinedGroupPayload,
 	createUserLeftGroupPayload,
-} from 'src/Payload/ForwardableEvent/GroupEvents';
+} from 'src/Payload/Creation/GroupEvents';
 import { Client, GroupNotification } from 'whatsapp-web.js';
 
 export const onUserJoinedGroup =
@@ -14,7 +14,7 @@ export const onUserJoinedGroup =
 				payload,
 			});
 		} catch (e) {
-			console.warn(`Error when creating group event: ${e}`)
+			console.warn(`Error when creating group event: ${e}`);
 		}
 	};
 
@@ -27,6 +27,6 @@ export const onUserLeftGroup =
 				payload,
 			});
 		} catch (e) {
-			console.warn(`Error when creating group event: ${e}`)
+			console.warn(`Error when creating group event: ${e}`);
 		}
 	};
