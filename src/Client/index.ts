@@ -1,58 +1,85 @@
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
-import { onMessageReceived } from 'src/Socket/Emitting';
-import { Socket } from 'socket.io-client';
-import { runningOnWindows } from 'src/util/OS';
-import { onUserJoinedGroup } from 'src/Socket/Emitting/groupEvents';
+import createBoundary from 'kozz-boundary-maker';
+import Context, { setHostData } from 'src/Context';
+import { createMessagePayload } from 'src/PayloadTransformers';
 
-type WaSocket = Socket;
+export const initSession = async (
+	boundary: ReturnType<typeof createBoundary>
+): Promise<Client> => {
+	console.clear();
+	console.log('Initializing WhatsApp Web client...');
 
-const chromePath = runningOnWindows()
-	? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-	: '/usr/bin/google-chrome-stable';
-
-const createBoundary = (socket: WaSocket) => {
-	const whatsappBoundary = new Client({
+	const client = new Client({
 		authStrategy: new LocalAuth(),
 		puppeteer: {
-			executablePath: chromePath,
 			headless: true,
+			args: ['--no-sandbox', '--disable-setuid-sandbox'],
 		},
 	});
 
-	whatsappBoundary.on('qr', qr => {
+	// QR Code generation
+	client.on('qr', qr => {
+		console.log('QR Code received, scan with WhatsApp:');
 		qrcode.generate(qr, { small: true });
+		boundary.emitForwardableEvent('kozz-iwac', 'qr_code');
+		Context.upsert({ qr });
 	});
 
-	whatsappBoundary.on('ready', () => {
-		console.log('[SERVIDOR]: Cliente pronto');
+	// Authentication
+	client.on('authenticated', () => {
+		console.log('Authenticated successfully!');
 	});
 
-	whatsappBoundary.on('change_state', state => {
-		console.log(state);
+	client.on('auth_failure', msg => {
+		console.error('Authentication failure:', msg);
 	});
 
-	whatsappBoundary.on('auth_failure', message => console.log(message));
+	// Ready event
+	client.on('ready', async () => {
+		console.log('Client is ready!');
 
-	whatsappBoundary.on('loading_screen', (percent, message) =>
-		console.log({
-			percent,
-			message,
-		})
-	);
+		const info = client.info;
+		if (info) {
+			setHostData(info.wid._serialized, info.pushname);
+		}
 
-	whatsappBoundary.on('group_join', onUserJoinedGroup(whatsappBoundary, socket));
+		boundary.emitForwardableEvent('kozz-iwac', 'chat_ready');
+		Context.upsert({ ready: true, qr: null });
 
-	whatsappBoundary.on('group_leave', onUserJoinedGroup(whatsappBoundary, socket));
-
-	// [TODO]: Make "host_metioned" a forwardable event.
-	whatsappBoundary.on('message_create', async message => {});
-
-	whatsappBoundary.on('message_create', async message => {
-		onMessageReceived(socket, whatsappBoundary)(message);
+		console.log('WhatsApp client ready and connected!');
 	});
 
-	return whatsappBoundary;
+	// Message received
+	client.on('message_create', async message => {
+		try {
+			console.log(`Processing message ${message.id._serialized}`);
+
+			const payload = await createMessagePayload(message, client);
+
+			if (payload.contact.isBlocked) {
+				return;
+			}
+
+			// Emit to gateway
+			boundary.emitMessage(payload);
+
+			// Notify chat order change
+			boundary.emitForwardableEvent('chat_order_move_to_top', payload.chatId);
+		} catch (e) {
+			console.warn('Error processing message:', e);
+		}
+	});
+
+	// Disconnected
+	client.on('disconnected', reason => {
+		console.log('Client disconnected:', reason);
+		Context.upsert({ ready: false, qr: null });
+		boundary.emitForwardableEvent('kozz-iwac', 'reconnecting');
+	});
+
+	// Initialize client
+	await client.initialize();
+
+	return client;
 };
-
-export default createBoundary;
